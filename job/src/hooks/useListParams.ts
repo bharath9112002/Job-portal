@@ -9,18 +9,24 @@ export function useListParams() {
   const [params, setParams] = useSearchParams()
   const get = (key: string) => params.get(key) ?? ''
 
-  const setParam = (key: string, value: string) => {
+  /** Update several params in one navigation (separate calls in a row would overwrite each other). */
+  const setMany = (updates: Record<string, string>) => {
+    const isPaging = Object.keys(updates).length === 1 && 'page' in updates
     setParams(
       (prev) => {
         const next = new URLSearchParams(prev)
-        if (value) next.set(key, value)
-        else next.delete(key)
-        if (key !== 'page') next.delete('page')
+        for (const [key, value] of Object.entries(updates)) {
+          if (value) next.set(key, value)
+          else next.delete(key)
+        }
+        // Any filter change goes back to page 1.
+        if (!isPaging) next.delete('page')
         return next
       },
-      { replace: key !== 'page' },
+      { replace: !isPaging },
     )
   }
+  const setParam = (key: string, value: string) => setMany({ [key]: value })
 
   const query = get('q')
   const [search, setSearch] = useState(query)
@@ -42,6 +48,7 @@ export function useListParams() {
   return {
     get,
     setParam,
+    setMany,
     query,
     search,
     setSearch,

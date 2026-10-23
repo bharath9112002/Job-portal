@@ -12,10 +12,13 @@ import JobForm from './pages/jobs/JobForm'
 import JobList from './pages/jobs/JobList'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import JobSearch from './pages/search/JobSearch'
+import JobView from './pages/search/JobView'
 import './App.css'
 import './dashboard.css'
 import './companies.css'
 import './jobs.css'
+import './search.css'
 
 function App() {
   return (
@@ -34,6 +37,8 @@ function App() {
           <Route path="/jobs/new" element={<ProtectedRoute><JobForm /></ProtectedRoute>} />
           <Route path="/jobs/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
           <Route path="/jobs/:id/edit" element={<ProtectedRoute><JobForm /></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute><JobSearch /></ProtectedRoute>} />
+          <Route path="/search/:id" element={<ProtectedRoute><JobView /></ProtectedRoute>} />
           {[
             ['/candidates', 'Candidates'],
             ['/applications', 'Applications'],
