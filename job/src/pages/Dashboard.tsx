@@ -14,7 +14,7 @@ import {
 } from '../data/dashboardData'
 
 const ACTION_ROUTES: Record<string, string> = {
-  'post-job': '/jobs',
+  'post-job': '/jobs/new',
   'add-company': '/companies/new',
   candidates: '/candidates',
   applications: '/applications',

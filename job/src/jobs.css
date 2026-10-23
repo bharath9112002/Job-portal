@@ -1,0 +1,338 @@
+/* ---------- Status tabs ---------- */
+.status-tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.status-tab {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.status-tab:hover {
+  color: var(--text-h);
+}
+.status-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+.tab-count {
+  display: inline-block;
+  min-width: 22px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  text-align: center;
+}
+
+.toolbar-jobs {
+  grid-template-columns: 1fr 190px 150px 170px;
+  margin-top: 16px;
+}
+@media (max-width: 1100px) {
+  .toolbar-jobs {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .toolbar-jobs .search-box {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 560px) {
+  .toolbar-jobs {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Job cards ---------- */
+.job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.job-list[aria-busy='true'] {
+  margin-top: 46px;
+}
+.job-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.job-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.job-card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.job-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.job-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+.job-company {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  width: fit-content;
+}
+.job-facts {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 14px;
+}
+.job-facts li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.job-facts svg {
+  color: var(--muted);
+}
+.job-salary {
+  font-weight: 600;
+  color: var(--text-h);
+}
+.job-skills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.more-skills {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.job-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.job-deadline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.job-deadline.expired {
+  color: var(--danger);
+  font-weight: 600;
+}
+.job-actions {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+  width: 280px;
+}
+
+@media (max-width: 760px) {
+  .job-card {
+    flex-direction: column;
+  }
+  .job-card-side {
+    align-items: flex-start;
+  }
+  .job-actions {
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* ---------- Status badge ---------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px 2px 8px;
+  border-radius: 999px;
+  width: fit-content;
+}
+.status-badge.open {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.status-badge.closed {
+  background: var(--code-bg);
+  color: var(--muted);
+}
+
+/* ---------- Skill tags ---------- */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  padding: 3px 6px 3px 10px;
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+.skill-tag.static {
+  padding: 3px 10px;
+}
+.skill-tag button {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.skill-tag button:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.skills-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+}
+.skills-input:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.skills-input.invalid {
+  border-color: var(--danger);
+}
+.field .skills-input input {
+  flex: 1;
+  min-width: 160px;
+  width: auto;
+  border: 0;
+  padding: 4px;
+  box-shadow: none;
+  background: transparent;
+}
+.field .skills-input input:focus {
+  box-shadow: none;
+}
+
+/* ---------- Form extras ---------- */
+.form-section-title {
+  font-size: 15px;
+  margin: 8px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.form-section-title:not(:first-child) {
+  margin-top: 12px;
+}
+.status-field {
+  border: 0;
+  padding: 0;
+  margin: 0 0 16px;
+  min-width: 0;
+}
+.status-field legend {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin-bottom: 6px;
+  padding: 0;
+}
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 44px;
+}
+.segmented label {
+  display: grid;
+  place-items: center;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--input-bg);
+  color: var(--text);
+}
+.segmented label + label {
+  border-left: 1px solid var(--border);
+}
+.segmented label.selected {
+  background: var(--accent);
+  color: #fff;
+}
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+.segmented label {
+  position: relative;
+}
+.segmented input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Details extras ---------- */
+.deadline-note {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.deadline-note.expired {
+  color: var(--danger);
+}
+.posted-on {
+  margin: 24px 0 0;
+}
+.details-actions {
+  flex-wrap: wrap;
+}

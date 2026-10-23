@@ -1,55 +1,34 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { deleteCompany, fetchCompanies } from '../../companies/api'
 import type { Company } from '../../companies/types'
 import { AdminLayout } from '../../components/AdminLayout'
 import { CompanyLogo } from '../../components/CompanyLogo'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
+import { FlashMessage } from '../../components/FlashMessage'
 import { Icon } from '../../components/Icon'
 import { Pagination } from '../../components/Pagination'
+import { useFlash } from '../../hooks/useFlash'
+import { useListParams } from '../../hooks/useListParams'
 
 const PAGE_SIZE = 9
 
 type Status = 'loading' | 'error' | 'ready'
 
 export default function CompanyList() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [params, setParams] = useSearchParams()
-
-  // Search, filter, sort and page live in the URL so they survive reloads and the back button.
-  const query = params.get('q') ?? ''
-  const industry = params.get('industry') ?? ''
-  const sort = params.get('sort') === 'desc' ? 'desc' : 'asc'
-  const requestedPage = Math.max(1, Number(params.get('page')) || 1)
+  const { get, setParam, query, search, setSearch, requestedPage, changePage, clearAll } = useListParams()
+  const industry = get('industry')
+  const sort = get('sort') === 'desc' ? 'desc' : 'asc'
 
   const [companies, setCompanies] = useState<Company[]>([])
   const [status, setStatus] = useState<Status>('loading')
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
 
-  // The search box keeps its own state so fast typing isn't lost; the URL follows after a short pause.
-  const [search, setSearch] = useState(query)
-  useEffect(() => {
-    if (search === query) return
-    const t = setTimeout(() => setParam('q', search), 250)
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search])
-  // Follow the URL when it changes from outside (back/forward, "Clear filters").
-  useEffect(() => setSearch(query), [query])
-
-  const [flash, setFlash] = useState<string>((location.state as { flash?: string } | null)?.flash ?? '')
+  const [flash, setFlash] = useFlash()
   const [toDelete, setToDelete] = useState<Company | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
-
-  // Clear the one-time flash message from history so it doesn't reappear on refresh.
-  useEffect(() => {
-    if ((location.state as { flash?: string } | null)?.flash) {
-      navigate(location.pathname + location.search, { replace: true, state: null })
-    }
-  }, [location, navigate])
 
   useEffect(() => {
     let cancelled = false
@@ -98,24 +77,6 @@ export default function CompanyList() {
   const page = Math.min(requestedPage, totalPages)
   const pageItems = visible.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const setParam = (key: string, value: string) => {
-    setParams(
-      (prev) => {
-        const next = new URLSearchParams(prev)
-        if (value) next.set(key, value)
-        else next.delete(key)
-        if (key !== 'page') next.delete('page')
-        return next
-      },
-      { replace: key !== 'page' },
-    )
-  }
-
-  const changePage = (p: number) => {
-    setParam('page', p === 1 ? '' : String(p))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   const confirmDelete = async () => {
     if (!toDelete) return
     setDeleting(true)
@@ -147,14 +108,7 @@ export default function CompanyList() {
         </Link>
       </div>
 
-      {flash && (
-        <div className="alert alert-success alert-dismissible" role="status">
-          <span>{flash}</span>
-          <button type="button" aria-label="Dismiss" onClick={() => setFlash('')}>
-            <Icon name="x" size={16} />
-          </button>
-        </div>
-      )}
+      <FlashMessage message={flash} onDismiss={() => setFlash('')} />
 
       <div className="toolbar">
         <label className="search-box">
@@ -224,7 +178,7 @@ export default function CompanyList() {
                 {hasFilters ? 'Try a different search or industry.' : 'Add your first company to get started.'}
               </p>
               {hasFilters && (
-                <button type="button" className="btn btn-outline" onClick={() => setParams({})}>
+                <button type="button" className="btn btn-outline" onClick={clearAll}>
                   Clear filters
                 </button>
               )}

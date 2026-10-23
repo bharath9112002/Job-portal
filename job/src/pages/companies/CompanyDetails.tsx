@@ -1,31 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, deleteCompany, fetchCompany } from '../../companies/api'
 import type { Company } from '../../companies/types'
 import { AdminLayout } from '../../components/AdminLayout'
 import { CompanyLogo } from '../../components/CompanyLogo'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
+import { FlashMessage } from '../../components/FlashMessage'
 import { Icon } from '../../components/Icon'
+import { useFlash } from '../../hooks/useFlash'
 
 export default function CompanyDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const [company, setCompany] = useState<Company | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
-  const [flash, setFlash] = useState<string>((location.state as { flash?: string } | null)?.flash ?? '')
+  const [flash, setFlash] = useFlash()
 
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
-
-  useEffect(() => {
-    if ((location.state as { flash?: string } | null)?.flash) {
-      navigate(location.pathname, { replace: true, state: null })
-    }
-  }, [location, navigate])
 
   useEffect(() => {
     let cancelled = false
@@ -90,14 +85,7 @@ export default function CompanyDetails() {
 
       {company && (
         <>
-          {flash && (
-            <div className="alert alert-success alert-dismissible" role="status">
-              <span>{flash}</span>
-              <button type="button" aria-label="Dismiss" onClick={() => setFlash('')}>
-                <Icon name="x" size={16} />
-              </button>
-            </div>
-          )}
+          <FlashMessage message={flash} onDismiss={() => setFlash('')} />
 
           <div className="panel">
             <div className="details-head">
