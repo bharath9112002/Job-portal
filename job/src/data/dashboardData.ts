@@ -14,6 +14,14 @@ export type IconName =
   | 'calendar'
   | 'logout'
   | 'menu'
+  | 'search'
+  | 'pin'
+  | 'globe'
+  | 'mail'
+  | 'edit'
+  | 'trash'
+  | 'arrow-left'
+  | 'eye'
 
 export interface Stat {
   id: string

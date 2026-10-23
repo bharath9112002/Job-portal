@@ -1,4 +1,4 @@
-import { useState, type InputHTMLAttributes } from 'react'
+import { useState, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
@@ -52,6 +52,69 @@ export function PasswordField({ label, name, error, ...props }: FieldProps) {
           {visible ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
+      {error && (
+        <p className="field-error" id={`${name}-error`} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label: string
+  name: string
+  error?: string
+  options: string[]
+  placeholder?: string
+}
+
+export function SelectField({ label, name, error, options, placeholder, ...props }: SelectProps) {
+  return (
+    <div className="field">
+      <label htmlFor={name}>{label}</label>
+      <select
+        id={name}
+        name={name}
+        className={error ? 'invalid' : undefined}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${name}-error` : undefined}
+        {...props}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+      {error && (
+        <p className="field-error" id={`${name}-error`} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label: string
+  name: string
+  error?: string
+  hint?: string
+}
+
+export function TextAreaField({ label, name, error, hint, ...props }: TextAreaProps) {
+  return (
+    <div className="field">
+      <label htmlFor={name}>{label}</label>
+      <textarea
+        id={name}
+        name={name}
+        className={error ? 'invalid' : undefined}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${name}-error` : undefined}
+        {...props}
+      />
+      {hint && !error && <p className="field-hint">{hint}</p>}
       {error && (
         <p className="field-error" id={`${name}-error`} role="alert">
           {error}

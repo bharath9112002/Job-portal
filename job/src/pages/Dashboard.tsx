@@ -15,7 +15,7 @@ import {
 
 const ACTION_ROUTES: Record<string, string> = {
   'post-job': '/jobs',
-  'add-company': '/companies',
+  'add-company': '/companies/new',
   candidates: '/candidates',
   applications: '/applications',
 }
