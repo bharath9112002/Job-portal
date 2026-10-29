@@ -602,3 +602,8 @@
 .coming-soon .btn:hover {
   text-decoration: none;
 }
+
+/* Keep focused fields clear of the sticky top bar when the browser scrolls to them. */
+html {
+  scroll-padding-top: 76px;
+}
