@@ -11,6 +11,7 @@ const NAV = [
   { to: '/saved', label: 'Saved Jobs', icon: 'bookmark' },
   { to: '/candidates', label: 'Candidates', icon: 'users' },
   { to: '/applications', label: 'Applications', icon: 'file' },
+  { to: '/reports', label: 'Reports', icon: 'chart' },
 ]
 
 export function AdminLayout({ children }) {

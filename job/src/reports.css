@@ -1,0 +1,219 @@
+/* ---------- Reports ---------- */
+.report-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.report-section-head .section-title {
+  margin: 0;
+}
+
+.data-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.data-badge.live {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.data-badge.sample {
+  background: var(--code-bg);
+  color: var(--muted);
+}
+
+.report-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1250px) {
+  .report-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .report-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 420px) {
+  .report-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+.stat-note {
+  font-size: 13px;
+  color: var(--muted);
+}
+.error-note {
+  color: var(--danger);
+}
+.muted-value {
+  color: var(--muted);
+}
+
+.panel-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Most applied jobs */
+.top-jobs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.top-jobs li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.top-rank {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.top-body {
+  flex: 1;
+  min-width: 0;
+}
+.top-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.top-line > span:first-child {
+  min-width: 0;
+}
+.top-title {
+  font-weight: 600;
+  color: var(--text-h);
+}
+.top-company {
+  display: block;
+  font-size: 13px;
+}
+.top-count {
+  font-weight: 700;
+  color: var(--text-h);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.top-count .muted {
+  font-weight: 400;
+  font-size: 13px;
+}
+
+/* Monthly stats */
+.month-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+@media (max-width: 760px) {
+  .month-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.month-stats > div {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+}
+.month-stats dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.month-stats dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--text-h);
+  font-variant-numeric: tabular-nums;
+}
+.trend.up {
+  color: var(--success);
+}
+.trend.down {
+  color: var(--danger);
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.report-table th,
+.report-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.report-table th {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.report-table td:nth-child(n + 2),
+.report-table th:nth-child(n + 2) {
+  text-align: right;
+}
+
+.charts-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1150px) {
+  .charts-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .charts-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  .sidebar,
+  .topbar,
+  .sidebar-backdrop,
+  .no-print,
+  .panel-head-actions .btn {
+    display: none !important;
+  }
+  .admin-main {
+    margin-left: 0;
+  }
+  .dashboard-main {
+    max-width: none;
+    padding: 0;
+  }
+  .panel,
+  .stat-card {
+    break-inside: avoid;
+  }
+}

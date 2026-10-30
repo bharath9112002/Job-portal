@@ -18,6 +18,7 @@ import JobForm from './pages/jobs/JobForm'
 import JobList from './pages/jobs/JobList'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Reports from './pages/Reports'
 import SavedJobs from './pages/saved/SavedJobs'
 import JobSearch from './pages/search/JobSearch'
 import JobView from './pages/search/JobView'
@@ -28,6 +29,7 @@ import './jobs.css'
 import './search.css'
 import './candidates.css'
 import './applications.css'
+import './reports.css'
 
 const publicOnly = (page) => <PublicOnlyRoute>{page}</PublicOnlyRoute>
 const protectedPage = (page) => <ProtectedRoute>{page}</ProtectedRoute>
@@ -66,6 +68,8 @@ function App() {
 
               <Route path="/applications" element={protectedPage(<ApplicationList />)} />
               <Route path="/applications/:id" element={protectedPage(<ApplicationDetails />)} />
+
+              <Route path="/reports" element={protectedPage(<Reports />)} />
 
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
