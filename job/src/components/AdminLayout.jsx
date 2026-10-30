@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth'
+import { useAuth } from '../hooks/useAuth'
 import { Icon } from './Icon'
 
 const NAV = [
@@ -8,6 +8,7 @@ const NAV = [
   { to: '/companies', label: 'Companies', icon: 'building' },
   { to: '/jobs', label: 'Jobs', icon: 'briefcase' },
   { to: '/search', label: 'Job Search', icon: 'search' },
+  { to: '/saved', label: 'Saved Jobs', icon: 'bookmark' },
   { to: '/candidates', label: 'Candidates', icon: 'users' },
   { to: '/applications', label: 'Applications', icon: 'file' },
 ]

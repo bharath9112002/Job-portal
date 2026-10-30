@@ -4,8 +4,16 @@
   gap: 6px;
   margin-top: 20px;
   border-bottom: 1px solid var(--border);
+  /* On narrow screens the tabs scroll sideways instead of widening the page. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.status-tabs::-webkit-scrollbar {
+  display: none;
 }
 .status-tab {
+  flex-shrink: 0;
+  white-space: nowrap;
   font: inherit;
   font-size: 14px;
   font-weight: 500;

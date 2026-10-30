@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { AuthContext, REMEMBER_KEY } from './useAuth'
-import { clearSession, findUserByEmail, getSession, saveUser, setSession } from './storage'
+import { clearSession, findUserByEmail, getSession, saveUser, setRememberedEmail, setSession } from '../auth/storage'
+import { AuthContext } from './AuthContext'
 
 function toSession(user) {
   const { password: _password, ...rest } = user
@@ -9,21 +9,19 @@ function toSession(user) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getSession())
+  // True after the user clicks Log out, so the next login starts at the dashboard, not the last page.
+  const [loggedOut, setLoggedOut] = useState(false)
 
   const login = (email, password, remember) => {
     const found = findUserByEmail(email)
     if (!found || found.password !== password) {
       return { ok: false, error: 'Invalid email or password' }
     }
-    try {
-      if (remember) localStorage.setItem(REMEMBER_KEY, found.email)
-      else localStorage.removeItem(REMEMBER_KEY)
-    } catch {
-      // ignore
-    }
+    setRememberedEmail(remember ? found.email : '')
     const session = toSession(found)
     setSession(session)
     setUser(session)
+    setLoggedOut(false)
     return { ok: true }
   }
 
@@ -43,13 +41,15 @@ export function AuthProvider({ children }) {
     const session = toSession(newUser)
     setSession(session)
     setUser(session)
+    setLoggedOut(false)
     return { ok: true }
   }
 
   const logout = () => {
     clearSession()
     setUser(null)
+    setLoggedOut(true)
   }
 
-  return <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loggedOut, login, register, logout }}>{children}</AuthContext.Provider>
 }

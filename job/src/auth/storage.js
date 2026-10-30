@@ -13,6 +13,7 @@
 
 const USERS_KEY = 'jobportal_users'
 const SESSION_KEY = 'jobportal_session'
+const REMEMBER_KEY = 'jobportal_remember_email'
 
 // The demo account is always available so the app can be tried without registering.
 export const DEMO_ACCOUNTS = [
@@ -71,6 +72,24 @@ export function setSession(user) {
 export function clearSession() {
   try {
     localStorage.removeItem(SESSION_KEY)
+  } catch {
+    // ignore
+  }
+}
+
+/** Email pre-filled on the login form when "Remember me" was ticked. */
+export function getRememberedEmail() {
+  try {
+    return localStorage.getItem(REMEMBER_KEY) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+export function setRememberedEmail(email) {
+  try {
+    if (email) localStorage.setItem(REMEMBER_KEY, email)
+    else localStorage.removeItem(REMEMBER_KEY)
   } catch {
     // ignore
   }

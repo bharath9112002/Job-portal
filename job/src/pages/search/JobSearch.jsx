@@ -5,6 +5,7 @@ import { EMPLOYMENT_TYPES, EXPERIENCE_LEVELS, formatSalary, isAcceptingApplicati
 import { AdminLayout } from '../../components/AdminLayout'
 import { Icon } from '../../components/Icon'
 import { Pagination } from '../../components/Pagination'
+import { SaveJobButton } from '../../components/SaveJobButton'
 import { useListParams } from '../../hooks/useListParams'
 
 const PAGE_SIZE = 6
@@ -386,9 +387,12 @@ export default function JobSearch() {
                   </div>
                   <div className="result-foot">
                     <span className="muted">Posted {postedAgo(j.postedAt).toLowerCase()}</span>
-                    <Link to={`/search/${j.id}`} state={{ from: location.search }} className="btn btn-outline btn-sm">
-                      View details
-                    </Link>
+                    <span className="saved-actions">
+                      <SaveJobButton jobId={j.id} jobTitle={j.title} compact />
+                      <Link to={`/search/${j.id}`} state={{ from: location.search }} className="btn btn-outline btn-sm">
+                        View details
+                      </Link>
+                    </span>
                   </div>
                 </article>
               ))}

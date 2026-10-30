@@ -4,8 +4,11 @@ import { fetchCompany } from '../../companies/api'
 import { fetchJob } from '../../jobs/api'
 import { formatDate, formatSalary, isAcceptingApplications, postedAgo } from '../../jobs/types'
 import { AdminLayout } from '../../components/AdminLayout'
+import { ApplyDialog } from '../../components/ApplyDialog'
 import { CompanyLogo } from '../../components/CompanyLogo'
 import { Icon } from '../../components/Icon'
+import { SaveJobButton } from '../../components/SaveJobButton'
+import { useApplications } from '../../hooks/useApplications'
 
 /** Read-only job view for job seekers, reached from Job Search. */
 export default function JobView() {
@@ -18,6 +21,10 @@ export default function JobView() {
   const [error, setError] = useState(null)
   const [company, setCompany] = useState(null)
   const [companyFailed, setCompanyFailed] = useState(false)
+  const [applyOpen, setApplyOpen] = useState(false)
+  const [flash, setFlash] = useState(null)
+  const { applications } = useApplications()
+  const jobApplications = applications.filter((a) => a.jobId === Number(id) && a.status !== 'withdrawn')
 
   useEffect(() => {
     let cancelled = false
@@ -60,6 +67,18 @@ export default function JobView() {
         </div>
       )}
 
+      {flash && (
+        <div className="alert alert-success alert-dismissible" role="status">
+          <span>
+            Application submitted for {flash.candidateName}.{' '}
+            <Link to={`/applications/${flash.id}`}>View application</Link>
+          </span>
+          <button type="button" aria-label="Dismiss" onClick={() => setFlash(null)}>
+            <Icon name="x" size={16} />
+          </button>
+        </div>
+      )}
+
       {job && (
         <div className="view-layout">
           <div className="panel">
@@ -77,6 +96,20 @@ export default function JobView() {
                 </p>
                 <p className="muted view-posted">Posted {postedAgo(job.postedAt).toLowerCase()}</p>
               </div>
+            </div>
+
+            <div className="view-actions">
+              {isAcceptingApplications(job) && (
+                <button type="button" className="btn btn-primary btn-icon" onClick={() => setApplyOpen(true)}>
+                  <Icon name="file" size={16} /> Apply for this job
+                </button>
+              )}
+              <SaveJobButton jobId={job.id} jobTitle={job.title} />
+              {jobApplications.length > 0 && (
+                <Link to={`/applications?job=${job.id}`} className="view-app-count">
+                  {jobApplications.length} {jobApplications.length === 1 ? 'application' : 'applications'}
+                </Link>
+              )}
             </div>
 
             <div className="view-highlights">
@@ -151,6 +184,17 @@ export default function JobView() {
             )}
           </aside>
         </div>
+      )}
+      {job && (
+        <ApplyDialog
+          open={applyOpen}
+          job={job}
+          onClose={() => setApplyOpen(false)}
+          onApplied={(created) => {
+            setApplyOpen(false)
+            setFlash(created)
+          }}
+        />
       )}
     </AdminLayout>
   )

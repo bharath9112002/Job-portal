@@ -11,9 +11,11 @@ import {
 } from '../../candidates/model'
 import { formatDate } from '../../jobs/types'
 import { AdminLayout } from '../../components/AdminLayout'
+import { AppStatusBadge } from '../../components/AppStatusBadge'
 import { Avatar } from '../../components/Avatar'
 import { FlashMessage } from '../../components/FlashMessage'
 import { Icon } from '../../components/Icon'
+import { useApplications } from '../../hooks/useApplications'
 import { useFlash } from '../../hooks/useFlash'
 
 export default function CandidateProfile() {
@@ -21,6 +23,10 @@ export default function CandidateProfile() {
   const [candidate, setCandidate] = useState(null)
   const [error, setError] = useState(null)
   const [flash, setFlash] = useFlash()
+  const { applications, loadState: appsState } = useApplications()
+  const applied = applications
+    .filter((a) => a.candidateId === Number(id))
+    .sort((a, b) => b.appliedAt.localeCompare(a.appliedAt))
 
   useEffect(() => {
     let cancelled = false
@@ -176,6 +182,25 @@ export default function CandidateProfile() {
                   </div>
                 ) : (
                   <p className="muted">No resume uploaded.</p>
+                )}
+              </section>
+
+              <section className="panel">
+                <h2 className="details-section-title">Applied jobs</h2>
+                {appsState !== 'ready' ? (
+                  <p className="muted">{appsState === 'loading' ? 'Loading…' : 'Applications could not be loaded.'}</p>
+                ) : applied.length === 0 ? (
+                  <p className="muted">No applications yet.</p>
+                ) : (
+                  <ul className="applied-list">
+                    {applied.map((a) => (
+                      <li key={a.id}>
+                        <Link to={`/applications/${a.id}`} className="applied-title">{a.jobTitle}</Link>
+                        <span className="muted">{a.companyName} · {formatDate(a.appliedAt)}</span>
+                        <AppStatusBadge status={a.status} />
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </section>
 

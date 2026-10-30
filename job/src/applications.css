@@ -1,0 +1,293 @@
+/* ---------- Status badge ---------- */
+.app-status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.app-status.info {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.app-status.warning {
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+.app-status.success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.app-status.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.app-status.muted {
+  background: var(--code-bg);
+  color: var(--muted);
+}
+@media (prefers-color-scheme: dark) {
+  .app-status.warning {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+  }
+}
+
+/* ---------- Application list ---------- */
+.toolbar-apps {
+  grid-template-columns: 1fr 180px 200px;
+  margin-top: 16px;
+}
+@media (max-width: 760px) {
+  .toolbar-apps {
+    grid-template-columns: 1fr 1fr;
+  }
+  .toolbar-apps .search-box {
+    grid-column: 1 / -1;
+  }
+}
+.toolbar-apps + .active-chips {
+  margin-top: 12px;
+}
+
+.app-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.app-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) 120px 120px 70px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+}
+.app-row:first-child {
+  border-top: 0;
+}
+.app-head {
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.app-candidate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.app-candidate > span:last-child,
+.app-job {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.app-name,
+.app-job-title {
+  font-weight: 600;
+  color: var(--text-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-candidate .muted,
+.app-job .muted {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-date {
+  font-size: 14px;
+}
+.app-action {
+  text-align: right;
+}
+.mobile-label {
+  display: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .app-head {
+    display: none;
+  }
+  .app-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'candidate status'
+      'job job'
+      'date action';
+    gap: 8px 12px;
+  }
+  .app-candidate { grid-area: candidate; }
+  .app-row > [role='cell']:nth-child(4) { grid-area: status; justify-self: end; }
+  .app-job { grid-area: job; padding-left: 46px; }
+  .app-date { grid-area: date; padding-left: 46px; color: var(--muted); font-size: 13px; }
+  .app-action { grid-area: action; }
+  .mobile-label { display: inline; }
+}
+
+/* ---------- Application details ---------- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.app-header-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.app-header-main h1 {
+  font-size: 24px;
+}
+.app-header-main .result-company {
+  margin: 0;
+}
+.timeline-dot.past {
+  background: var(--border);
+}
+.timeline h3 .app-status {
+  font-size: 12px;
+}
+.aside-company a.muted {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.dialog-note {
+  margin: -8px 0 16px;
+}
+.confirm-dialog .field input {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-h);
+}
+
+/* ---------- Apply dialog ---------- */
+.apply-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+.apply-dialog h2 {
+  margin-bottom: 2px;
+}
+.apply-dialog .apply-sub {
+  margin: 0 0 18px;
+}
+.apply-candidate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -4px 0 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-bg);
+}
+.apply-candidate > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+}
+.apply-candidate strong {
+  color: var(--text-h);
+  font-size: 14px;
+}
+.apply-warn {
+  color: #b45309;
+  font-weight: 500;
+}
+
+/* ---------- Job view / search additions ---------- */
+.view-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: -4px 0 22px;
+}
+.view-app-count {
+  font-size: 14px;
+}
+.save-btn.saved {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+.save-btn.icon-only {
+  width: 34px;
+  height: 32px;
+  padding: 0;
+}
+.saved-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.link-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.result-card.unavailable {
+  opacity: 0.75;
+  border-style: dashed;
+}
+.state-panel > svg {
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* ---------- Candidate profile: applied jobs ---------- */
+.applied-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.applied-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.applied-list li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.applied-title {
+  font-size: 14px;
+}
+.applied-list .muted {
+  font-size: 12px;
+  margin-bottom: 4px;
+}

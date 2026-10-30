@@ -585,24 +585,6 @@
   white-space: nowrap;
 }
 
-/* ---------- Coming soon ---------- */
-.coming-soon {
-  text-align: center;
-  padding: 48px 20px;
-}
-.coming-soon h1 {
-  font-size: 24px;
-}
-.coming-soon .muted {
-  margin: 8px 0 20px;
-}
-.coming-soon .btn {
-  display: inline-block;
-}
-.coming-soon .btn:hover {
-  text-decoration: none;
-}
-
 /* Keep focused fields clear of the sticky top bar when the browser scrolls to them. */
 html {
   scroll-padding-top: 76px;

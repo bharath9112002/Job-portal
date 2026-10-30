@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth'
+import { useAuth } from '../hooks/useAuth'
 import { passwordStrength, validateEmail, validateName, validatePassword } from '../auth/validation'
 import { AuthLayout } from '../components/AuthLayout'
 import { PasswordField, TextField } from '../components/FormFields'

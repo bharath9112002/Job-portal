@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth'
+import { useAuth } from '../hooks/useAuth'
 import { AdminLayout } from '../components/AdminLayout'
 import { BarList, ColumnChart } from '../components/Charts'
 import { Icon } from '../components/Icon'
