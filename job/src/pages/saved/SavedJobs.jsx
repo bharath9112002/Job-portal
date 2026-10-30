@@ -4,10 +4,12 @@ import { fetchJobs } from '../../jobs/api'
 import { formatDate, formatSalary, isAcceptingApplications, postedAgo } from '../../jobs/types'
 import { AdminLayout } from '../../components/AdminLayout'
 import { Icon } from '../../components/Icon'
+import { usePortal } from '../../hooks/usePortal'
 import { useSavedJobs } from '../../hooks/useSavedJobs'
 
 export default function SavedJobs() {
   const { saved, remove, toggle, storageError } = useSavedJobs()
+  const { jobsPath } = usePortal()
   const [jobs, setJobs] = useState(null)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
@@ -38,7 +40,7 @@ export default function SavedJobs() {
           <h1>Saved Jobs</h1>
           <p className="auth-subtitle">Jobs you bookmarked from Job Search.</p>
         </div>
-        <Link to="/search" className="btn btn-outline btn-icon">
+        <Link to={jobsPath} className="btn btn-outline btn-icon">
           <Icon name="search" size={18} />
           Browse jobs
         </Link>
@@ -110,7 +112,7 @@ export default function SavedJobs() {
               <Icon name="bookmark" size={32} />
               <h2>No saved jobs yet</h2>
               <p className="muted">Use the bookmark button on any job in Job Search to save it here.</p>
-              <Link to="/search" className="btn btn-primary">Go to Job Search</Link>
+              <Link to={jobsPath} className="btn btn-primary">Go to Job Search</Link>
             </div>
           ) : (
             <div className="result-list">
@@ -120,7 +122,7 @@ export default function SavedJobs() {
                     <div className="result-top">
                       <div>
                         <h2 className="result-title">
-                          <Link to={`/search/${entry.jobId}`}>{entry.job.title}</Link>
+                          <Link to={`${jobsPath}/${entry.jobId}`}>{entry.job.title}</Link>
                         </h2>
                         <p className="result-company">{entry.job.companyName}</p>
                       </div>
@@ -144,7 +146,7 @@ export default function SavedJobs() {
                         <button type="button" className="btn btn-outline btn-sm btn-danger-outline" onClick={() => onRemove(entry)}>
                           <Icon name="trash" size={15} /> Remove
                         </button>
-                        <Link to={`/search/${entry.jobId}`} className="btn btn-primary btn-sm">
+                        <Link to={`${jobsPath}/${entry.jobId}`} className="btn btn-primary btn-sm">
                           {isAcceptingApplications(entry.job) ? 'View & apply' : 'View'}
                         </Link>
                       </span>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ROLES } from '../auth/roles'
 import { clearSession, findUserByEmail, getSession, saveUser, setRememberedEmail, setSession } from '../auth/storage'
 import { AuthContext } from './AuthContext'
 
@@ -12,20 +13,28 @@ export function AuthProvider({ children }) {
   // True after the user clicks Log out, so the next login starts at the dashboard, not the last page.
   const [loggedOut, setLoggedOut] = useState(false)
 
-  const login = (email, password, remember) => {
+  const login = (email, password, role, remember) => {
     const found = findUserByEmail(email)
     if (!found || found.password !== password) {
       return { ok: false, error: 'Invalid email or password' }
     }
+    // Accounts made before roles existed are admins.
+    const accountRole = found.role ?? 'admin'
+    if (accountRole !== role) {
+      return {
+        ok: false,
+        error: `This is ${accountRole === 'admin' ? 'an' : 'a'} ${ROLES[accountRole].label.toLowerCase()} account. Select “${ROLES[accountRole].label}” and try again.`,
+      }
+    }
     setRememberedEmail(remember ? found.email : '')
-    const session = toSession(found)
+    const session = toSession({ ...found, role: accountRole })
     setSession(session)
     setUser(session)
     setLoggedOut(false)
     return { ok: true }
   }
 
-  const register = ({ name, email, password }) => {
+  const register = ({ name, email, password, role }) => {
     if (findUserByEmail(email)) {
       return { ok: false, error: 'An account with this email already exists' }
     }
@@ -34,7 +43,7 @@ export function AuthProvider({ children }) {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password,
-      role: 'admin',
+      role,
       createdAt: new Date().toISOString(),
     }
     saveUser(newUser)

@@ -76,3 +76,8 @@ export async function updateCandidate(id, data) {
   save(candidates.map((c) => (c.id === id ? candidate : c)))
   return candidate
 }
+
+/** The profile linked to a candidate account (same email), or null if they haven't created one yet. */
+export async function fetchCandidateByEmail(email) {
+  return load().find((c) => c.email.toLowerCase() === email.toLowerCase()) ?? null
+}

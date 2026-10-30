@@ -589,3 +589,52 @@
 html {
   scroll-padding-top: 76px;
 }
+
+/* ---------- Role indicators ---------- */
+.portal-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.role-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.role-pill.candidate {
+  background: var(--success-bg);
+  color: var(--success);
+}
+@media (max-width: 560px) {
+  .role-pill {
+    display: none;
+  }
+}
+.nav-badge {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.activity-text:hover {
+  text-decoration: underline;
+}
+a.activity-text {
+  color: var(--text-h);
+}

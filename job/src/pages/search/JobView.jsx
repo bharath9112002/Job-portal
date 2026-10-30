@@ -4,18 +4,26 @@ import { fetchCompany } from '../../companies/api'
 import { fetchJob } from '../../jobs/api'
 import { formatDate, formatSalary, isAcceptingApplications, postedAgo } from '../../jobs/types'
 import { AdminLayout } from '../../components/AdminLayout'
+import { AppStatusBadge } from '../../components/AppStatusBadge'
 import { ApplyDialog } from '../../components/ApplyDialog'
 import { CompanyLogo } from '../../components/CompanyLogo'
 import { Icon } from '../../components/Icon'
 import { SaveJobButton } from '../../components/SaveJobButton'
 import { useApplications } from '../../hooks/useApplications'
+import { useMyProfile } from '../../hooks/useMyProfile'
+import { usePortal } from '../../hooks/usePortal'
 
-/** Read-only job view for job seekers, reached from Job Search. */
+/**
+ * Read-only job view, reached from Job Search. Admins apply on behalf of a candidate;
+ * candidates apply as themselves (they need a profile first).
+ */
 export default function JobView() {
   const { id } = useParams()
   const location = useLocation()
   // Return to the same search, filters and page the user came from.
-  const backTo = `/search${location.state?.from ?? ''}`
+  const { isCandidate, jobsPath } = usePortal()
+  const backTo = `${jobsPath}${location.state?.from ?? ''}`
+  const me = useMyProfile()
 
   const [job, setJob] = useState(null)
   const [error, setError] = useState(null)
@@ -25,6 +33,8 @@ export default function JobView() {
   const [flash, setFlash] = useState(null)
   const { applications } = useApplications()
   const jobApplications = applications.filter((a) => a.jobId === Number(id) && a.status !== 'withdrawn')
+  const myApplication = me.profile && jobApplications.find((a) => a.candidateId === me.profile.id)
+  const applicationPath = (appId) => (isCandidate ? `/candidate/applications/${appId}` : `/applications/${appId}`)
 
   useEffect(() => {
     let cancelled = false
@@ -53,7 +63,7 @@ export default function JobView() {
         <div className="panel state-panel" role="alert">
           <h2>{error.status === 404 ? 'Job not found' : "Couldn't load this job"}</h2>
           <p className="muted">{error.message}</p>
-          <Link to="/search" className="btn btn-primary">
+          <Link to={jobsPath} className="btn btn-primary">
             Search jobs
           </Link>
         </div>
@@ -70,8 +80,8 @@ export default function JobView() {
       {flash && (
         <div className="alert alert-success alert-dismissible" role="status">
           <span>
-            Application submitted for {flash.candidateName}.{' '}
-            <Link to={`/applications/${flash.id}`}>View application</Link>
+            {isCandidate ? 'Your application was submitted.' : `Application submitted for ${flash.candidateName}.`}{' '}
+            <Link to={applicationPath(flash.id)}>View application</Link>
           </span>
           <button type="button" aria-label="Dismiss" onClick={() => setFlash(null)}>
             <Icon name="x" size={16} />
@@ -99,13 +109,32 @@ export default function JobView() {
             </div>
 
             <div className="view-actions">
-              {isAcceptingApplications(job) && (
-                <button type="button" className="btn btn-primary btn-icon" onClick={() => setApplyOpen(true)}>
-                  <Icon name="file" size={16} /> Apply for this job
-                </button>
-              )}
+              {isAcceptingApplications(job) &&
+                (!isCandidate ? (
+                  <button type="button" className="btn btn-primary btn-icon" onClick={() => setApplyOpen(true)}>
+                    <Icon name="file" size={16} /> Apply for this job
+                  </button>
+                ) : myApplication ? (
+                  <span className="applied-note">
+                    <Icon name="check" size={16} /> You applied · <AppStatusBadge status={myApplication.status} />{' '}
+                    <Link to={applicationPath(myApplication.id)}>View application</Link>
+                  </span>
+                ) : me.loadState === 'ready' && !me.profile ? (
+                  <Link to="/candidate/profile/edit" className="btn btn-primary btn-icon">
+                    <Icon name="users" size={16} /> Create your profile to apply
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-icon"
+                    disabled={!me.profile}
+                    onClick={() => setApplyOpen(true)}
+                  >
+                    <Icon name="file" size={16} /> Apply now
+                  </button>
+                ))}
               <SaveJobButton jobId={job.id} jobTitle={job.title} />
-              {jobApplications.length > 0 && (
+              {!isCandidate && jobApplications.length > 0 && (
                 <Link to={`/applications?job=${job.id}`} className="view-app-count">
                   {jobApplications.length} {jobApplications.length === 1 ? 'application' : 'applications'}
                 </Link>
@@ -189,6 +218,7 @@ export default function JobView() {
         <ApplyDialog
           open={applyOpen}
           job={job}
+          candidate={isCandidate ? me.profile : undefined}
           onClose={() => setApplyOpen(false)}
           onApplied={(created) => {
             setApplyOpen(false)

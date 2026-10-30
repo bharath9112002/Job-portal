@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { homeFor } from '../auth/roles'
 import { useAuth } from '../hooks/useAuth'
 import { passwordStrength, validateEmail, validateName, validatePassword } from '../auth/validation'
 import { AuthLayout } from '../components/AuthLayout'
-import { PasswordField, TextField } from '../components/FormFields'
+import { PasswordField, RoleSelector, TextField } from '../components/FormFields'
 
 const STRENGTH_LABELS = ['Too weak', 'Weak', 'Fair', 'Good', 'Strong']
 
@@ -12,6 +13,7 @@ export default function Register() {
   const navigate = useNavigate()
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' })
+  const [role, setRole] = useState('candidate')
   const [terms, setTerms] = useState(false)
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -40,17 +42,18 @@ export default function Register() {
     setErrors(found)
     if (Object.values(found).some(Boolean)) return
 
-    const result = register({ name: form.name, email: form.email, password: form.password })
+    const result = register({ name: form.name, email: form.email, password: form.password, role })
     if (!result.ok) {
       setFormError(result.error ?? 'Registration failed')
       return
     }
-    navigate('/dashboard', { replace: true })
+    navigate(homeFor(role), { replace: true })
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Register a new admin account">
+    <AuthLayout title="Create your account" subtitle="Join as a candidate or an admin">
       <form onSubmit={onSubmit} noValidate>
+        <RoleSelector value={role} onChange={setRole} />
         <TextField
           label="Full name"
           name="name"

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
+  APPLICATIONS_KEY,
   createApplication,
   fetchApplications,
   updateApplicationStatus,
@@ -30,6 +31,21 @@ export function ApplicationsProvider({ children }) {
       cancelled = true
     }
   }, [reloadKey])
+
+  // Another tab (e.g. a candidate applying) changed the applications: pick up the new data.
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key !== APPLICATIONS_KEY) return
+      fetchApplications()
+        .then((data) => {
+          setApplications(data)
+          setLoadState('ready')
+        })
+        .catch(() => {})
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
 
   const value = useMemo(() => {
     const replace = (updated) => setApplications((list) => list.map((a) => (a.id === updated.id ? updated : a)))

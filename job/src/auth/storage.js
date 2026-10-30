@@ -4,7 +4,7 @@
  * @property {string} name
  * @property {string} email
  * @property {string} password
- * @property {'admin'} role
+ * @property {'admin' | 'candidate'} role
  * @property {string} createdAt
  *
  * The logged-in user, as kept in the session key (never includes the password):
@@ -15,7 +15,8 @@ const USERS_KEY = 'jobportal_users'
 const SESSION_KEY = 'jobportal_session'
 const REMEMBER_KEY = 'jobportal_remember_email'
 
-// The demo account is always available so the app can be tried without registering.
+// Demo accounts are always available so the app can be tried without registering.
+// The candidate demo uses the same email as Priya Sharma's sample profile, which links them.
 export const DEMO_ACCOUNTS = [
   {
     id: 'demo-admin',
@@ -23,6 +24,14 @@ export const DEMO_ACCOUNTS = [
     email: 'admin@demo.com',
     password: 'Admin@123',
     role: 'admin',
+    createdAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'demo-candidate',
+    name: 'Priya Sharma',
+    email: 'priya.sharma@example.com',
+    password: 'Candidate@123',
+    role: 'candidate',
     createdAt: '2026-01-01T00:00:00.000Z',
   },
 ]

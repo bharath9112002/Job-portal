@@ -6,7 +6,7 @@ import { seedApplications } from './seed'
  * and throw on failure so callers treat them like a real API.
  */
 
-const APPLICATIONS_KEY = 'jobportal_applications'
+export const APPLICATIONS_KEY = 'jobportal_applications'
 
 export class ApplicationError extends Error {
   constructor(message, status) {

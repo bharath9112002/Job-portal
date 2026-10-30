@@ -2,6 +2,8 @@ const fmt = (n) => n.toLocaleString('en-IN')
 
 /** Rounds the max up to a tidy axis ceiling (e.g. 2930 → 3000). */
 function niceMax(max) {
+  // Small counts (live data) round up to a multiple of 4, so the quarter ticks are whole numbers.
+  if (max <= 40) return Math.max(4, Math.ceil(max / 4) * 4)
   const step = 10 ** Math.floor(Math.log10(max))
   return Math.ceil(max / (step / 2)) * (step / 2)
 }
@@ -50,7 +52,8 @@ export function ColumnChart({ title, data, unit }) {
 
 /** Single-series horizontal bars, direct-labelled with their values. */
 export function BarList({ title, data, unit }) {
-  const max = Math.max(...data.map((d) => d.value))
+  // At least 1, so an all-zero list doesn't divide by zero.
+  const max = Math.max(1, ...data.map((d) => d.value))
   return (
     <figure className="chart">
       <ul className="bar-list" aria-label={title}>

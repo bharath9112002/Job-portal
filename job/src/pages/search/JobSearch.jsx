@@ -7,6 +7,7 @@ import { Icon } from '../../components/Icon'
 import { Pagination } from '../../components/Pagination'
 import { SaveJobButton } from '../../components/SaveJobButton'
 import { useListParams } from '../../hooks/useListParams'
+import { usePortal } from '../../hooks/usePortal'
 
 const PAGE_SIZE = 6
 const SALARY_STEPS = [25000, 50000, 75000, 100000, 125000, 150000, 200000]
@@ -45,6 +46,7 @@ const splitList = (v) => (v ? v.split(',') : [])
 
 export default function JobSearch() {
   const location = useLocation()
+  const { isCandidate, jobsPath } = usePortal()
   const { get, setParam, setMany, query, search, setSearch, requestedPage, changePage, clearAll } = useListParams()
 
   const filters = {
@@ -129,7 +131,7 @@ export default function JobSearch() {
     <AdminLayout>
       <div className="page-head">
         <div>
-          <h1>Job Search</h1>
+          <h1>{isCandidate ? 'Find Jobs' : 'Job Search'}</h1>
           <p className="auth-subtitle">Browse open positions across all companies.</p>
         </div>
       </div>
@@ -352,7 +354,7 @@ export default function JobSearch() {
                   <div className="result-top">
                     <div>
                       <h2 className="result-title">
-                        <Link to={`/search/${j.id}`} state={{ from: location.search }}>
+                        <Link to={`${jobsPath}/${j.id}`} state={{ from: location.search }}>
                           {j.title}
                         </Link>
                       </h2>
@@ -389,7 +391,7 @@ export default function JobSearch() {
                     <span className="muted">Posted {postedAgo(j.postedAt).toLowerCase()}</span>
                     <span className="saved-actions">
                       <SaveJobButton jobId={j.id} jobTitle={j.title} compact />
-                      <Link to={`/search/${j.id}`} state={{ from: location.search }} className="btn btn-outline btn-sm">
+                      <Link to={`${jobsPath}/${j.id}`} state={{ from: location.search }} className="btn btn-outline btn-sm">
                         View details
                       </Link>
                     </span>

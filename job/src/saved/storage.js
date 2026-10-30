@@ -24,3 +24,17 @@ export function storeSavedJobs(email, entries) {
     return false
   }
 }
+
+/** Total saved jobs across every user on this browser (for the admin dashboard). */
+export function countAllSavedJobs() {
+  let total = 0
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.startsWith('jobportal_saved_jobs:')) total += JSON.parse(localStorage.getItem(key) || '[]').length
+    }
+  } catch {
+    // ignore unreadable entries
+  }
+  return total
+}

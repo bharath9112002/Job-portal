@@ -1,20 +1,19 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ROLES, redirectAfterLogin } from '../auth/roles'
 import { DEMO_ACCOUNTS, getRememberedEmail } from '../auth/storage'
-import { useAuth } from '../hooks/useAuth'
 import { validateEmail } from '../auth/validation'
+import { useAuth } from '../hooks/useAuth'
 import { AuthLayout } from '../components/AuthLayout'
-import { PasswordField, TextField } from '../components/FormFields'
-
-const DEMO = DEMO_ACCOUNTS[0]
+import { PasswordField, RoleSelector, TextField } from '../components/FormFields'
 
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = location.state?.from ?? '/dashboard'
 
   const [form, setForm] = useState(() => ({ email: getRememberedEmail(), password: '' }))
+  const [role, setRole] = useState('admin')
   const [remember, setRemember] = useState(() => !!getRememberedEmail())
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -35,24 +34,33 @@ export default function Login() {
     const found = validate(form)
     setErrors(found)
     if (Object.values(found).some(Boolean)) return
-    const result = login(form.email, form.password, remember)
+    const result = login(form.email, form.password, role, remember)
     if (!result.ok) {
       setFormError(result.error ?? 'Login failed')
       return
     }
-    navigate(from, { replace: true })
+    navigate(redirectAfterLogin(role, location.state?.from), { replace: true })
   }
 
-  // Fills the form with the demo credentials; the user still clicks "Log in".
-  const fillDemo = () => {
-    setForm({ email: DEMO.email, password: DEMO.password })
+  // Fills the form (and the matching role) with a demo account; the user still clicks "Log in".
+  const fillDemo = (demo) => {
+    setForm({ email: demo.email, password: demo.password })
+    setRole(demo.role)
     setErrors({})
     setFormError('')
   }
 
   return (
-    <AuthLayout title="Admin login" subtitle="Log in to continue to the admin panel">
+    <AuthLayout title="Welcome back" subtitle="Log in to your JobPortal account">
       <form onSubmit={onSubmit} noValidate>
+        <RoleSelector
+          value={role}
+          legend="Log in as"
+          onChange={(r) => {
+            setRole(r)
+            setFormError('')
+          }}
+        />
         <TextField
           label="Email"
           name="email"
@@ -63,7 +71,6 @@ export default function Login() {
           error={errors.email}
           onChange={(e) => update('email', e.target.value)}
         />
-
         <PasswordField
           label="Password"
           name="password"
@@ -89,7 +96,7 @@ export default function Login() {
         )}
 
         <button type="submit" className="btn btn-primary btn-block">
-          Log in
+          Log in as {ROLES[role].label.toLowerCase()}
         </button>
       </form>
 
@@ -98,13 +105,19 @@ export default function Login() {
       </p>
 
       <div className="demo-box">
-        <p className="demo-title">Demo admin account</p>
-        <p className="demo-creds">
-          Email <code>{DEMO.email}</code> · Password <code>{DEMO.password}</code>
-        </p>
-        <button type="button" className="btn btn-outline btn-block" onClick={fillDemo}>
-          Use demo credentials
-        </button>
+        <p className="demo-title">Demo accounts</p>
+        <div className="demo-grid">
+          {DEMO_ACCOUNTS.map((demo) => (
+            <div className="demo-account" key={demo.id}>
+              <strong>{ROLES[demo.role].label}</strong>
+              <code>{demo.email}</code>
+              <code>{demo.password}</code>
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => fillDemo(demo)}>
+                Use {ROLES[demo.role].label.toLowerCase()} demo
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </AuthLayout>
   )

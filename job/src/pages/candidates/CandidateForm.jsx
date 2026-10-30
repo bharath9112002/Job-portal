@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { createCandidate, fetchCandidate, updateCandidate } from '../../candidates/api'
+import { createCandidate, fetchCandidate, fetchCandidateByEmail, updateCandidate } from '../../candidates/api'
 import { DEGREE_SUGGESTIONS, currentMonth, emptyEducation, emptyExperience } from '../../candidates/model'
 import { validateCandidate } from '../../candidates/validation'
 import { SKILL_SUGGESTIONS } from '../../jobs/types'
@@ -10,6 +10,7 @@ import { Icon } from '../../components/Icon'
 import { PhotoUpload } from '../../components/PhotoUpload'
 import { ResumeUpload } from '../../components/ResumeUpload'
 import { SkillsInput } from '../../components/SkillsInput'
+import { useAuth } from '../../hooks/useAuth'
 
 const emptyProfile = () => ({
   fullName: '',
@@ -23,35 +24,51 @@ const emptyProfile = () => ({
   photo: '',
 })
 
-export default function CandidateForm() {
-  const { id } = useParams()
+const toFormValues = (c) => ({
+  fullName: c.fullName,
+  email: c.email,
+  mobile: c.mobile,
+  address: { ...c.address },
+  skills: [...c.skills],
+  experience: c.experience.map((e) => ({ ...e })),
+  education: c.education.map((e) => ({ ...e })),
+  resume: c.resume,
+  photo: c.photo,
+})
+
+/**
+ * Create/edit a candidate profile. Admins edit any profile (/candidates/:id/edit).
+ * With `self`, a logged-in candidate creates or edits their own profile, whose email is locked to their account.
+ */
+export default function CandidateForm({ self = false }) {
+  const params = useParams()
+  const { user } = useAuth()
+  // In self mode the profile id is only known once we've looked up the candidate's own profile.
+  const [selfId, setSelfId] = useState(undefined)
+  const id = self ? selfId : params.id
   const isEdit = id !== undefined
   const navigate = useNavigate()
 
   const [values, setValues] = useState(emptyProfile)
   const [errors, setErrors] = useState({})
-  const [loadState, setLoadState] = useState(isEdit ? 'loading' : 'ready')
+  const [loadState, setLoadState] = useState(self || isEdit ? 'loading' : 'ready')
   const [loadError, setLoadError] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
 
+  // Self mode: find the candidate's own profile; if there isn't one yet, start a new one from their account.
   useEffect(() => {
-    if (!isEdit) return
+    if (!self) return
     let cancelled = false
-    fetchCandidate(Number(id))
+    fetchCandidateByEmail(user.email)
       .then((c) => {
         if (cancelled) return
-        setValues({
-          fullName: c.fullName,
-          email: c.email,
-          mobile: c.mobile,
-          address: { ...c.address },
-          skills: [...c.skills],
-          experience: c.experience.map((e) => ({ ...e })),
-          education: c.education.map((e) => ({ ...e })),
-          resume: c.resume,
-          photo: c.photo,
-        })
+        if (c) {
+          setSelfId(String(c.id))
+          setValues(toFormValues(c))
+        } else {
+          setValues((v) => ({ ...v, fullName: user.name, email: user.email }))
+        }
         setLoadState('ready')
       })
       .catch((err) => {
@@ -62,7 +79,26 @@ export default function CandidateForm() {
     return () => {
       cancelled = true
     }
-  }, [id, isEdit])
+  }, [self, user.email, user.name])
+
+  useEffect(() => {
+    if (self || !isEdit) return
+    let cancelled = false
+    fetchCandidate(Number(id))
+      .then((c) => {
+        if (cancelled) return
+        setValues(toFormValues(c))
+        setLoadState('ready')
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setLoadError(err)
+        setLoadState('error')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [id, isEdit, self])
 
   const clearError = (...keys) => {
     if (keys.some((k) => errors[k])) {
@@ -144,7 +180,7 @@ export default function CandidateForm() {
     setSaveError('')
     try {
       const saved = isEdit ? await updateCandidate(Number(id), data) : await createCandidate(data)
-      navigate(`/candidates/${saved.id}`, {
+      navigate(self ? '/candidate/profile' : `/candidates/${saved.id}`, {
         replace: true,
         state: { flash: isEdit ? 'Profile updated.' : 'Profile created.' },
       })
@@ -159,21 +195,26 @@ export default function CandidateForm() {
     }
   }
 
-  const backTo = isEdit ? `/candidates/${id}` : '/candidates'
+  const backTo = self ? (isEdit ? '/candidate/profile' : '/candidate') : isEdit ? `/candidates/${id}` : '/candidates'
   const thisMonth = currentMonth()
   const errorCount = Object.keys(errors).length
 
   return (
     <AdminLayout>
       <Link to={backTo} className="back-link">
-        <Icon name="arrow-left" size={16} /> {isEdit ? 'Back to profile' : 'Back to candidates'}
+        <Icon name="arrow-left" size={16} />{' '}
+        {isEdit ? 'Back to profile' : self ? 'Back to home' : 'Back to candidates'}
       </Link>
 
       <div className="page-head">
         <div>
-          <h1>{isEdit ? 'Edit profile' : 'Create candidate profile'}</h1>
+          <h1>{self ? (isEdit ? 'Edit my profile' : 'Create your profile') : isEdit ? 'Edit profile' : 'Create candidate profile'}</h1>
           <p className="auth-subtitle">
-            {isEdit ? 'Update this candidate’s details.' : 'Fields marked * are required.'}
+            {self
+              ? 'Employers see this when you apply. Fields marked * are required.'
+              : isEdit
+                ? 'Update this candidate’s details.'
+                : 'Fields marked * are required.'}
           </p>
         </div>
       </div>
@@ -190,7 +231,9 @@ export default function CandidateForm() {
         <div className="panel state-panel" role="alert">
           <h2>{loadError?.status === 404 ? 'Candidate not found' : "Couldn't load this profile"}</h2>
           <p className="muted">{loadError?.message}</p>
-          <Link to="/candidates" className="btn btn-primary">Back to candidates</Link>
+          <Link to={self ? '/candidate' : '/candidates'} className="btn btn-primary">
+            {self ? 'Back to home' : 'Back to candidates'}
+          </Link>
         </div>
       )}
 
@@ -224,6 +267,8 @@ export default function CandidateForm() {
                 placeholder="name@example.com"
                 value={values.email}
                 error={errors.email}
+                readOnly={self}
+                title={self ? 'Linked to your account — it can’t be changed here' : undefined}
                 onChange={(e) => setField('email', e.target.value)}
               />
               <TextField

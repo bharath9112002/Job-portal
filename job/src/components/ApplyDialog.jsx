@@ -6,10 +6,10 @@ import { Avatar } from './Avatar'
 const MAX_COVER = 1000
 
 /**
- * Apply for a job on behalf of a candidate profile.
- * Candidates who already have an active application for this job can't be picked again.
+ * Apply for a job. Admins pick a candidate profile to apply on behalf of (candidates with an active
+ * application for this job can't be picked again). Pass `candidate` to apply as that candidate instead.
  */
-export function ApplyDialog({ open, job, onClose, onApplied }) {
+export function ApplyDialog({ open, job, candidate, onClose, onApplied }) {
   const ref = useRef(null)
   const { applications, apply } = useApplications()
 
@@ -28,9 +28,9 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
     if (!open && dialog.open) dialog.close()
   }, [open])
 
-  // Load candidate profiles the first time the dialog opens.
+  // Load candidate profiles the first time the dialog opens (not needed when applying as yourself).
   useEffect(() => {
-    if (!open || candidates) return
+    if (!open || candidates || candidate) return
     let cancelled = false
     fetchCandidates()
       .then((list) => !cancelled && setCandidates([...list].sort((a, b) => a.fullName.localeCompare(b.fullName))))
@@ -38,12 +38,12 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
     return () => {
       cancelled = true
     }
-  }, [open, candidates])
+  }, [open, candidates, candidate])
 
   const appliedIds = new Set(
     applications.filter((a) => a.jobId === job.id && a.status !== 'withdrawn').map((a) => a.candidateId),
   )
-  const selected = candidates?.find((c) => String(c.id) === candidateId)
+  const selected = candidate ?? candidates?.find((c) => String(c.id) === candidateId)
 
   const close = () => {
     if (saving) return
@@ -57,7 +57,7 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
   const submit = async (e) => {
     e.preventDefault()
     const found = {
-      candidateId: candidateId ? undefined : 'Choose a candidate',
+      candidateId: selected ? undefined : 'Choose a candidate',
       coverLetter: coverLetter.length > MAX_COVER ? `Keep it under ${MAX_COVER} characters` : undefined,
     }
     setErrors(found)
@@ -102,6 +102,7 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
 
         {loadError && <div className="alert alert-error" role="alert">{loadError}</div>}
 
+        {!candidate && (
         <div className="field">
           <label htmlFor="apply-candidate">Candidate</label>
           <select
@@ -129,6 +130,7 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
             <p className="field-error" id="apply-candidate-error" role="alert">{errors.candidateId}</p>
           )}
         </div>
+        )}
 
         {selected && (
           <div className="apply-candidate">
@@ -149,7 +151,7 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
             id="apply-cover"
             rows={5}
             value={coverLetter}
-            placeholder="Why is this candidate a good fit?"
+            placeholder={candidate ? 'Why are you a good fit for this role?' : 'Why is this candidate a good fit?'}
             className={errors.coverLetter ? 'invalid' : undefined}
             aria-invalid={!!errors.coverLetter}
             onChange={(e) => {
@@ -168,7 +170,7 @@ export function ApplyDialog({ open, job, onClose, onApplied }) {
 
         <div className="dialog-actions">
           <button type="button" className="btn btn-outline" onClick={close} disabled={saving}>Cancel</button>
-          <button type="submit" className="btn btn-primary" disabled={saving || !candidates}>
+          <button type="submit" className="btn btn-primary" disabled={saving || (!candidate && !candidates)}>
             {saving ? 'Submitting…' : 'Submit application'}
           </button>
         </div>

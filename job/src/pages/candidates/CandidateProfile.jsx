@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchCandidate } from '../../candidates/api'
+import { fetchCandidate, fetchCandidateByEmail } from '../../candidates/api'
 import {
   formatDuration,
   formatFileSize,
@@ -16,27 +16,40 @@ import { Avatar } from '../../components/Avatar'
 import { FlashMessage } from '../../components/FlashMessage'
 import { Icon } from '../../components/Icon'
 import { useApplications } from '../../hooks/useApplications'
+import { useAuth } from '../../hooks/useAuth'
 import { useFlash } from '../../hooks/useFlash'
 
-export default function CandidateProfile() {
+/**
+ * A candidate profile. Admins view any profile by id; with `self`, a logged-in candidate sees their own
+ * (or a prompt to create it).
+ */
+export default function CandidateProfile({ self = false }) {
   const { id } = useParams()
+  const { user } = useAuth()
   const [candidate, setCandidate] = useState(null)
+  const [missing, setMissing] = useState(false)
   const [error, setError] = useState(null)
   const [flash, setFlash] = useFlash()
   const { applications, loadState: appsState } = useApplications()
   const applied = applications
-    .filter((a) => a.candidateId === Number(id))
+    .filter((a) => a.candidateId === candidate?.id)
     .sort((a, b) => b.appliedAt.localeCompare(a.appliedAt))
+  const applicationPath = (appId) => (self ? `/candidate/applications/${appId}` : `/applications/${appId}`)
 
   useEffect(() => {
     let cancelled = false
-    fetchCandidate(Number(id))
-      .then((c) => !cancelled && setCandidate(c))
+    const request = self ? fetchCandidateByEmail(user.email) : fetchCandidate(Number(id))
+    request
+      .then((c) => {
+        if (cancelled) return
+        if (c) setCandidate(c)
+        else setMissing(true)
+      })
       .catch((err) => !cancelled && setError(err))
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, self, user.email])
 
   const c = candidate
   const role = c && latestRole(c.experience)
@@ -48,9 +61,19 @@ export default function CandidateProfile() {
 
   return (
     <AdminLayout>
-      <Link to="/candidates" className="back-link">
-        <Icon name="arrow-left" size={16} /> Back to candidates
-      </Link>
+      {!self && (
+        <Link to="/candidates" className="back-link">
+          <Icon name="arrow-left" size={16} /> Back to candidates
+        </Link>
+      )}
+
+      {missing && (
+        <div className="panel state-panel">
+          <h2>Create your profile</h2>
+          <p className="muted">You need a profile before you can apply for jobs. It only takes a few minutes.</p>
+          <Link to="/candidate/profile/edit" className="btn btn-primary">Create profile</Link>
+        </div>
+      )}
 
       {error && (
         <div className="panel state-panel" role="alert">
@@ -60,7 +83,7 @@ export default function CandidateProfile() {
         </div>
       )}
 
-      {!error && !c && (
+      {!error && !missing && !c && (
         <div className="panel" aria-busy="true" aria-label="Loading profile">
           <div className="skeleton skeleton-line" style={{ width: '40%', height: 26 }} />
           <div className="skeleton skeleton-line" style={{ width: '25%' }} />
@@ -84,7 +107,10 @@ export default function CandidateProfile() {
                 <li><Icon name="briefcase" size={15} />{totalMonths ? `${formatDuration(totalMonths)} experience` : 'Fresher'}</li>
               </ul>
             </div>
-            <Link to={`/candidates/${c.id}/edit`} className="btn btn-primary btn-icon profile-edit">
+            <Link
+              to={self ? '/candidate/profile/edit' : `/candidates/${c.id}/edit`}
+              className="btn btn-primary btn-icon profile-edit"
+            >
               <Icon name="edit" size={16} /> Edit profile
             </Link>
           </div>
@@ -195,7 +221,7 @@ export default function CandidateProfile() {
                   <ul className="applied-list">
                     {applied.map((a) => (
                       <li key={a.id}>
-                        <Link to={`/applications/${a.id}`} className="applied-title">{a.jobTitle}</Link>
+                        <Link to={applicationPath(a.id)} className="applied-title">{a.jobTitle}</Link>
                         <span className="muted">{a.companyName} · {formatDate(a.appliedAt)}</span>
                         <AppStatusBadge status={a.status} />
                       </li>

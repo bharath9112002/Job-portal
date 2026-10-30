@@ -1,5 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { ProtectedRoute, PublicOnlyRoute } from './auth/routes'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HomeRedirect, ProtectedRoute, PublicOnlyRoute } from './auth/routes'
 import { ApplicationsProvider } from './context/ApplicationsProvider'
 import { AuthProvider } from './context/AuthProvider'
 import { SavedJobsProvider } from './context/SavedJobsProvider'
@@ -7,6 +7,9 @@ import ApplicationDetails from './pages/applications/ApplicationDetails'
 import ApplicationList from './pages/applications/ApplicationList'
 import CandidateForm from './pages/candidates/CandidateForm'
 import CandidateList from './pages/candidates/CandidateList'
+import CandidateHome from './pages/candidate/CandidateHome'
+import MyApplicationDetails from './pages/candidate/MyApplicationDetails'
+import MyApplications from './pages/candidate/MyApplications'
 import CandidateProfile from './pages/candidates/CandidateProfile'
 import CompanyDetails from './pages/companies/CompanyDetails'
 import CompanyForm from './pages/companies/CompanyForm'
@@ -30,9 +33,11 @@ import './search.css'
 import './candidates.css'
 import './applications.css'
 import './reports.css'
+import './candidate-portal.css'
 
 const publicOnly = (page) => <PublicOnlyRoute>{page}</PublicOnlyRoute>
-const protectedPage = (page) => <ProtectedRoute>{page}</ProtectedRoute>
+const adminPage = (page) => <ProtectedRoute roles={['admin']}>{page}</ProtectedRoute>
+const candidatePage = (page) => <ProtectedRoute roles={['candidate']}>{page}</ProtectedRoute>
 
 function App() {
   return (
@@ -45,33 +50,44 @@ function App() {
               <Route path="/register" element={publicOnly(<Register />)} />
               <Route path="/forgot-password" element={publicOnly(<ForgotPassword />)} />
 
-              <Route path="/dashboard" element={protectedPage(<Dashboard />)} />
+              {/* ---------- Admin portal ---------- */}
+              <Route path="/dashboard" element={adminPage(<Dashboard />)} />
 
-              <Route path="/companies" element={protectedPage(<CompanyList />)} />
-              <Route path="/companies/new" element={protectedPage(<CompanyForm />)} />
-              <Route path="/companies/:id" element={protectedPage(<CompanyDetails />)} />
-              <Route path="/companies/:id/edit" element={protectedPage(<CompanyForm />)} />
+              <Route path="/companies" element={adminPage(<CompanyList />)} />
+              <Route path="/companies/new" element={adminPage(<CompanyForm />)} />
+              <Route path="/companies/:id" element={adminPage(<CompanyDetails />)} />
+              <Route path="/companies/:id/edit" element={adminPage(<CompanyForm />)} />
 
-              <Route path="/jobs" element={protectedPage(<JobList />)} />
-              <Route path="/jobs/new" element={protectedPage(<JobForm />)} />
-              <Route path="/jobs/:id" element={protectedPage(<JobDetails />)} />
-              <Route path="/jobs/:id/edit" element={protectedPage(<JobForm />)} />
+              <Route path="/jobs" element={adminPage(<JobList />)} />
+              <Route path="/jobs/new" element={adminPage(<JobForm />)} />
+              <Route path="/jobs/:id" element={adminPage(<JobDetails />)} />
+              <Route path="/jobs/:id/edit" element={adminPage(<JobForm />)} />
 
-              <Route path="/search" element={protectedPage(<JobSearch />)} />
-              <Route path="/search/:id" element={protectedPage(<JobView />)} />
-              <Route path="/saved" element={protectedPage(<SavedJobs />)} />
+              <Route path="/search" element={adminPage(<JobSearch />)} />
+              <Route path="/search/:id" element={adminPage(<JobView />)} />
+              <Route path="/saved" element={adminPage(<SavedJobs />)} />
 
-              <Route path="/candidates" element={protectedPage(<CandidateList />)} />
-              <Route path="/candidates/new" element={protectedPage(<CandidateForm />)} />
-              <Route path="/candidates/:id" element={protectedPage(<CandidateProfile />)} />
-              <Route path="/candidates/:id/edit" element={protectedPage(<CandidateForm />)} />
+              <Route path="/candidates" element={adminPage(<CandidateList />)} />
+              <Route path="/candidates/new" element={adminPage(<CandidateForm />)} />
+              <Route path="/candidates/:id" element={adminPage(<CandidateProfile />)} />
+              <Route path="/candidates/:id/edit" element={adminPage(<CandidateForm />)} />
 
-              <Route path="/applications" element={protectedPage(<ApplicationList />)} />
-              <Route path="/applications/:id" element={protectedPage(<ApplicationDetails />)} />
+              <Route path="/applications" element={adminPage(<ApplicationList />)} />
+              <Route path="/applications/:id" element={adminPage(<ApplicationDetails />)} />
 
-              <Route path="/reports" element={protectedPage(<Reports />)} />
+              <Route path="/reports" element={adminPage(<Reports />)} />
 
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              {/* ---------- Candidate portal ---------- */}
+              <Route path="/candidate" element={candidatePage(<CandidateHome />)} />
+              <Route path="/candidate/jobs" element={candidatePage(<JobSearch />)} />
+              <Route path="/candidate/jobs/:id" element={candidatePage(<JobView />)} />
+              <Route path="/candidate/saved" element={candidatePage(<SavedJobs />)} />
+              <Route path="/candidate/applications" element={candidatePage(<MyApplications />)} />
+              <Route path="/candidate/applications/:id" element={candidatePage(<MyApplicationDetails />)} />
+              <Route path="/candidate/profile" element={candidatePage(<CandidateProfile self />)} />
+              <Route path="/candidate/profile/edit" element={candidatePage(<CandidateForm self />)} />
+
+              <Route path="*" element={<HomeRedirect />} />
             </Routes>
           </BrowserRouter>
         </ApplicationsProvider>

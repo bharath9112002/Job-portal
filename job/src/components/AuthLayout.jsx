@@ -4,7 +4,7 @@ export function AuthLayout({ title, subtitle, children }) {
       <section className="auth-brand" aria-hidden="true">
         <div className="brand-logo">JobPortal</div>
         <h2>Your next opportunity starts here.</h2>
-        <p>Manage jobs, applications and accounts from one admin panel.</p>
+        <p>Candidates find roles that fit. Employers find people who fit.</p>
       </section>
       <section className="auth-card">
         <h1>{title}</h1>

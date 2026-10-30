@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ROLES } from '../auth/roles'
 
 export function TextField({ label, name, error, ...props }) {
   return (
@@ -105,6 +106,22 @@ export function TextAreaField({ label, name, error, hint, ...props }) {
         </p>
       )}
     </div>
+  )
+}
+
+/** Admin / Candidate choice used on the login and register forms. */
+export function RoleSelector({ value, onChange, legend = 'I am' }) {
+  return (
+    <fieldset className="role-selector">
+      <legend>{legend}</legend>
+      {Object.entries(ROLES).map(([id, r]) => (
+        <label key={id} className={value === id ? 'role-option selected' : 'role-option'}>
+          <input type="radio" name="role" value={id} checked={value === id} onChange={() => onChange(id)} />
+          <span className="role-title">{r.label}</span>
+          <span className="role-hint">{r.hint}</span>
+        </label>
+      ))}
+    </fieldset>
   )
 }
 
